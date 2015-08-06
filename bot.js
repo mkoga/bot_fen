@@ -1,5 +1,5 @@
 var Slack = require('slack-client');
-var token = 'xoxb-7893486887-cu3zofP0I5Ns5a33nCg9Tohx';
+var token = process.env.TOKEN || 'xoxb-7893486887-cu3zofP0I5Ns5a33nCg9Tohx';
 var slack = new Slack(token, true, true);
 
 var makeMention = function(userId) {
@@ -53,11 +53,11 @@ slack.on('message', function(message) {
   var generator = "http://www.eddins.net/steve/chess/ChessImager/ChessImager.php?fen=";
 
   if (message.type === 'message' && isDirect(slack.self.id, message.text)) {
-    var trimmedMessage = message.text.substr(makeMention(slack.self.id).length + 2).trim();
-    // + 2 is required to account for the colon and space before the FEN
+    var text = message.text;
+    text = text.replace(makeMention(slack.self.id) + ':', '');
+    text = text.replace(makeMention(slack.self.id), '');
 
-    var msg = generator += trimmedMessage;
-
+    var msg = generator + text.trim();
     channel.send(msg);
   }
 });
